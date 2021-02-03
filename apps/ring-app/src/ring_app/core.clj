@@ -7,7 +7,15 @@
     (str "<html><body>Your IP is: "
          (:remote-addr request-map) "</body></html>")))
 
+(defn wrap-nocache [handler]
+  (fn [request-map]
+    (-> request-map
+        handler
+        (assoc-in [:headers "Pragma"] "no-cache"))))
+
 (defn -main []
   (jetty/run-jetty
-    handler
-    {:port 3000 :join? false}))
+    (-> handler
+        wrap-nocache)
+    {:port 3000
+     :join? false}))
