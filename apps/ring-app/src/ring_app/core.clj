@@ -5,8 +5,9 @@
 
 (defn handler [request-map]
   (response/response
-    (str "<html><body>Your IP is: "
-         (:remote-addr request-map) "</body></html>")))
+    (str "<html><body>Hello, your IP is: "
+         (:remote-addr request-map)
+         "</body></html>")))
 
 (defn wrap-nocache [handler]
   (fn [request-map]
