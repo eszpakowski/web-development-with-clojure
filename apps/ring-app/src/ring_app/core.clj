@@ -1,11 +1,11 @@
 (ns ring-app.core
-  (:require [ring.adapter.jetty :as jetty]))
+  (:require [ring.adapter.jetty :as jetty]
+            [ring.util.response :as response]))
 
 (defn handler [request-map]
-  {:status  200
-   :headers {"Content-Type" "text/html"}
-   :body    (str "<html><body>Your IP is: "
-                 (:remote-addr request-map) "</body></html>")})
+  (response/response
+    (str "<html><body>Your IP is: "
+         (:remote-addr request-map) "</body></html>")))
 
 (defn -main []
   (jetty/run-jetty
