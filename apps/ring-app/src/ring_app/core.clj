@@ -29,12 +29,18 @@
   [["/"
     {:get  response-handler
      :post response-handler}]
+   ["/api"
+    {:middleware [wrap-formats]}]
    ["/resource/:id"
     {:get
      (fn [{{:keys [id]} :path-params}]
-       (response/ok (str "<p>passed resource id is:" id "</p>")))}]
-   ["/api"
-    {:middleware [wrap-formats]}]])
+       (response/ok
+         (str "<p>passed resource id is:" id "</p>")))}]
+   ["/extract-values"
+    {:post
+     (fn [{params :body-params}]
+       (response/ok
+         {:values (map (apply juxt [:a :b]) params)}))}]])
 
 (def handler
   (reitit/ring-handler
