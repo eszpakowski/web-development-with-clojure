@@ -46,6 +46,8 @@
   (reitit/routes
     (reitit/ring-handler
       (reitit/router routes))
+    (reitit/create-resource-handler
+      {:path "/"})
     (reitit/create-default-handler
       {:not-found
        (constantly (response/not-found "404 - Page not found"))
