@@ -5,6 +5,16 @@
             [ring.middleware.reload :refer [wrap-reload]]
             [muuntaja.middleware :as muuntaja]))
 
+(defn wrap-nocache [handler]
+  (fn [request-map]
+    (-> request-map
+        handler
+        (assoc-in [:headers "Pragma"] "no-cache"))))
+
+(defn wrap-formats [handler]
+  (-> handler
+      (muuntaja/wrap-format)))
+
 (defn response-handler [request-map]
   (response/ok
     (str "<html><body>Hello, your IP is: "
@@ -16,32 +26,22 @@
     {:result (get-in request-map [:body-params :id])}))
 
 (def routes
-  [["/" {:get  response-handler
-         :post response-handler}]
+  [["/"
+    {:get  response-handler
+     :post response-handler}]
    ["/resource/:id"
     {:get
      (fn [{{:keys [id]} :path-params}]
-       (response/ok (str "<p>passed resource id is:" id "</p>")))}]])
+       (response/ok (str "<p>passed resource id is:" id "</p>")))}]
+   ["/api"
+    {:middleware [wrap-formats]}]])
 
 (def handler
   (reitit/ring-handler
     (reitit/router routes)))
 
-(defn wrap-nocache [handler]
-  (fn [request-map]
-    (-> request-map
-        handler
-        (assoc-in [:headers "Pragma"] "no-cache"))))
-
-(defn wrap-formats [handler]
-  (-> handler
-      (muuntaja/wrap-format)))
-
 (defn -main []
   (jetty/run-jetty
-    (-> #'handler
-        wrap-nocache
-        wrap-formats
-        wrap-reload)
+    (-> #'handler wrap-nocache wrap-reload)
     {:port  3000
      :join? false}))
