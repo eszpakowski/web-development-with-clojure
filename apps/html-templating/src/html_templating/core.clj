@@ -1,7 +1,10 @@
 (ns html-templating.core
-  (:require [selmer.parser :as selmer]))
+  (:require [selmer.parser :as selmer]
+            [selmer.filters :as filters]
+            [selmer.middleware :refer [wrap-error-page]]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn renderer []
+  (wrap-error-page
+    (fn [template]
+      {:status 200
+       :body (selmer/render-file template {})})))
