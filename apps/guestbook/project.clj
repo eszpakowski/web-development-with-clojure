@@ -31,6 +31,7 @@
                  [ring/ring-core "1.8.0"]
                  [ring/ring-defaults "0.3.2"]
                  [selmer "1.12.18"]
+                 [cljs-ajax "0.8.0"]
                  [org.clojure/clojurescript "1.10.238" :scope "provided"]
                  [reagent "0.10.0"]]
 
