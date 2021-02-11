@@ -1,22 +1,34 @@
 (ns guestbook.core
   (:require
+    [clojure.string :as string]
     [reagent.core :as r]
     [reagent.dom :as dom]
     [ajax.core :refer [GET POST]]))
 
-(defn send-message! [fields]
+(defn send-message! [fields errors]
   (POST "/message"
-        {:format        :json
-         :headers       {"Accept"       "application/transit+json"
-                         "x-csrf-token" (.-value (.getElementById js/document "token"))}
-         :params        @fields
-         :handler       #(.log js/console (str "response:" %))
-         :error-handler #(.error js/console (str "error:" %))}))
+        {:format  :json
+         :headers {"Accept"       "application/transit+json"
+                   "x-csrf-token" (.-value (.getElementById js/document "token"))}
+         :params  @fields
+         :handler #(do
+                     (.log js/console (str "response:" %))
+                     (reset! errors nil))
+         :error-handler
+                  #(do
+                     (.log js/console (str "error:" %))
+                     (reset! errors (get-in % [:response :errors])))}))
+
+(defn errors-component [errors id]
+  (when-let [error (id @errors)]
+    [:div.notification.is-danger (string/join error)]))
 
 (defn message-form []
-  (let [fields (r/atom {})]
+  (let [fields (r/atom {})
+        errors (r/atom {})]
     (fn []
       [:div
+       [errors-component errors :server-error]
        [:div.field
         [:label.label {:for :name} "Name"]
         [:input.input
@@ -32,7 +44,7 @@
           :on-change #(swap! fields assoc :message (-> % .-target .-value))}]]
        [:input.button.is-primary
         {:type     :submit
-         :on-click #(send-message! fields)
+         :on-click #(send-message! fields errors)
          :value    "comment"}]
        [:hr]
        [:p "Name: " (:name @fields)]
