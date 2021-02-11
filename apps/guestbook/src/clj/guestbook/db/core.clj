@@ -1,6 +1,7 @@
 (ns guestbook.db.core
   (:require
     [clojure.java.jdbc :as jdbc]
+    [java-time :refer [java-date]]
     [conman.core :as conman]
     [java-time.pre-java8 :as jt]
     [mount.core :refer [defstate]]
@@ -16,7 +17,7 @@
 (extend-protocol jdbc/IResultSetReadColumn
   java.sql.Timestamp
   (result-set-read-column [v _2 _3]
-    (.toLocalDateTime v))
+    (java-date (.atZone (.toLocalDateTime v) (java.time.ZoneId/systemDefault))))
   java.sql.Date
   (result-set-read-column [v _2 _3]
     (.toLocalDate v))
