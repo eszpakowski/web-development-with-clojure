@@ -4,22 +4,9 @@
     [guestbook.db.core :as db]
     [clojure.java.io :as io]
     [guestbook.middleware :as middleware]
+    [guestbook.validation :refer [validate-message]]
     [ring.util.response]
-    [ring.util.http-response :as response]
-    [struct.core :as struct]))
-
-(def message-schema
-  [[:name
-    struct/required
-    struct/string]
-   [:message
-    struct/required
-    struct/string
-    {:message  "Message must have at least 10 characters!"
-     :validate (fn [msg] (>= (count msg) 10))}]])
-
-(defn validate-message [params]
-  (first (struct/validate params message-schema)))
+    [ring.util.http-response :as response]))
 
 (defn home-page [{:keys [flash] :as request}]
   (layout/render
