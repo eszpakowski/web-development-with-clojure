@@ -50,6 +50,7 @@
        [errors-component errors :server-error]
        [:div.field
         [:label.label {:for :name} "Name"]
+        [errors-component errors :name]
         [:input.input
          {:type      :text
           :name      :name
@@ -57,6 +58,7 @@
           :value     (:name @fields)}]]
        [:div.field
         [:label.label {:for :message} "Message"]
+        [errors-component errors :message]
         [:textarea.textarea
          {:name      :message
           :value     (:message @fields)
